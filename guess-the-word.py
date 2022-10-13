@@ -20,18 +20,34 @@ def getTopScore():
 def pressKey(event):
     pass
 
+def compareWord(s1, s2):
+    res = 0                                                             #результат, що повертається
+    for i in range(len(s1)):                                            #Порівнюємо s1 та s2 посимвольно
+        if (s1[i] != s2[i]):                                            #якщо символи різні то збільшуємо res
+            res += 1
+    #print(f"{res}")
+    return res
+
+
+def getWordStar(ch):
+    ret = ""                                                            #Змінна для результату
+    for i in range(len(wordComp)):
+        if (wordComp[i] == ch):
+            ret += ch
+        else:
+            ret += wordStar[i]
+    return ret
+
 def pressLetter(n):
     global wordStar
     btn[n]["text"] = "."
     btn[n]["state"] = "disabled"
+    oldWordStar = wordStar
     wordStar = getWordStar(stringAlphabet[n])
+    count = compareWord(wordStar, oldWordStar)                          #Знаходимо відмінності між старою та новою версією
+    wordLabel["text"] = wordStar
+    
     print(f"Ви натиснули на букву {stringAlphabet[n]}")
-
-def getWordStar(ch):
-    pass
-
-def compareWord(s1, s2):
-    pass
 
 def updateInfo():
     pass
@@ -68,7 +84,7 @@ userTry = 10        # кількість спроб
 
 #st = ord("А")                                      # для визначення символу на кнопці по коду
 btn = []                                            # список для кнопок
-stringAlphabet = "АБВГДЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"  # укр абетка
+stringAlphabet = "АБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"  # укр абетка
 
 
 for i in range(len(stringAlphabet)):
