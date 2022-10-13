@@ -2,7 +2,15 @@ from tkinter import *
 from random import randint
 
 def startNewRound():
-    pass
+    global wordStar, wordComp
+    #загадуємо слово
+    wordComp = "ІНТЕРНЕТ"
+    #формуємо строку з *
+    wordStar = "*" * len(wordComp)
+    #встановлюємо текст в мітку
+    wordLabel["text"] = wordStar
+    #центруємо мітку для виводу слова
+    wordLabel.place(x=WIDTH // 2 - wordLabel.winfo_reqwidth() // 2, y=50)
 
 def getWordsFromFile():
     pass
@@ -70,5 +78,13 @@ for i in range(len(stringAlphabet)):
     btn.append(Button(text=stringAlphabet[i], width=2, font="cosolas 15"))
     btn[i].place(x=215 + (i % 11) * 35, y=150 + i //11 * 50)
     btn[i]["command"] = lambda x=i: pressLetter(x)
+
+#Визначаємо глобально: "загадене слово"
+wordComp = ""
+#Визначаємо глобально: "слово з зірочками"
+wordStar = ""
+
+#стартуємо
+startNewRound()
 
 root.mainloop()
