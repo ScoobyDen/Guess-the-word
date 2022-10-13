@@ -21,6 +21,10 @@ def pressKey(event):
     pass
 
 def pressLetter(n):
+    global wordStar
+    btn[n]["text"] = "."
+    btn[n]["state"] = "disabled"
+    wordStar = getWordStar(stringAlphabet[n])
     print(f"Ви натиснули на букву {stringAlphabet[n]}")
 
 def getWordStar(ch):
