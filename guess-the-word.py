@@ -3,7 +3,7 @@ from random import randint
 from tkinter import messagebox
 
 def pressKey(event):
-    print(f"Клавіша: {event.keycode}")
+    #print(f"Клавіша: {event.keycode}")
     #CTRL
     if (event.keycode == 17):
         wordLabel["text"] = wordComp
@@ -11,7 +11,7 @@ def pressKey(event):
     ch = event.char.upper()
     if (len(ch) == 0):
         return 0
-    print(ch)
+    #print(ch)
     for i in range(len(stringAlphabet)):
         if (ch == stringAlphabet[i]):
             pressLetter(i)
