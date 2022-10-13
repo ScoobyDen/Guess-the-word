@@ -1,5 +1,6 @@
 from tkinter import *
 from random import randint
+from tkinter import messagebox
 
 def startNewRound():
     global wordStar, wordComp
@@ -9,13 +10,44 @@ def startNewRound():
     wordLabel.place(x=WIDTH // 2 - wordLabel.winfo_reqwidth() // 2, y=50)   #центруємо мітку для виводу слова
 
 def getWordsFromFile():
-    pass
+    ret = []                                                                #Змінна спсиок для результату, що повертається
+    #ставимо блок перевірки помилки
+    try:
+        #отримуємо діскріптор зверніть увагу на кодиіровку, в файлі повинно використовуватися utf-8
+        f = open("word.txt", "r", encoding="utf-8")
+
+        for l in f.readlines():                                             #читаємо построков
+            l = l.replace("\n", "")                                         #обов'язково вбираємо останній символ переносу строки
+            ret.append(l)                                                   #додаємо слово в список
+    
+        f.close()                                                           #не забуваємо закрити файл
+    except:
+        print("Проблема з файлом. Программа припиняє роботу")
+        quit(0)
+
+    return ret
+
 
 def saveTopScore():
-    pass
+    global topScore
+
+    topScore = score
+
+    try:
+        f = open("top.txt", "w", encoding="utf-8")
+        f.write(str(topScore))
+        f.close()
+    except:
+        messagebox.showinfo("Помилка", "Виникла проблема з файлом при зберігання очків рекорду")
 
 def getTopScore():
-    pass
+    try:
+        f = open("top.txt", "r", encoding="utf-8")
+        m = int(f.readline())
+        f.close()
+    except:
+        m = 0
+    return m
 
 def pressKey(event):
     pass
@@ -78,9 +110,9 @@ scoreLabel.place(x=10, y=165)
 topScoreLabel.place(x=10, y=190)
 userTryLabel.place(x=10, y=215)
 
-score = 0           # поточні очки
-topScore = 1000     # рекорд
-userTry = 10        # кількість спроб
+score = 0                       # поточні очки
+topScore = getTopScore()        # рекорд
+userTry = 10                    # кількість спроб
 
 #st = ord("А")                                      # для визначення символу на кнопці по коду
 btn = []                                            # список для кнопок
