@@ -2,18 +2,40 @@ from tkinter import *
 from random import randint
 from tkinter import messagebox
 
+def pressKey(event):
+    print(f"Клавіша: {event.keycode}")
+    #CTRL
+    if (event.keycode == 17):
+        wordLabel["text"] = wordComp
+
+    ch = event.char.upper()
+    if (len(ch) == 0):
+        return 0
+    print(ch)
+    for i in range(len(stringAlphabet)):
+        if (ch == stringAlphabet[i]):
+            pressLetter(i)
+
 def startNewRound():
     global wordStar, wordComp
-    wordComp = "ІНТЕРНЕТ"                                                   #загадуємо слово
+    wordComp = dictionary[randint(0, len(dictionary) - 1)]                  #загадуємо слово
     wordStar = "*" * len(wordComp)                                          #формуємо строку з *
     wordLabel["text"] = wordStar                                            #встановлюємо текст в мітку
     wordLabel.place(x=WIDTH // 2 - wordLabel.winfo_reqwidth() // 2, y=50)   #центруємо мітку для виводу слова
+    
+    for i in range(len(stringAlphabet)):
+        btn[i]["text"] = stringAlphabet[i]
+        btn[i]["state"] = "normal"
+
+    userTry = 10
+    
+    updateInfo()
 
 def getWordsFromFile():
     ret = []                                                                #Змінна спсиок для результату, що повертається
     #ставимо блок перевірки помилки
     try:
-        #отримуємо діскріптор зверніть увагу на кодиіровку, в файлі повинно використовуватися utf-8
+        #отримуємо діскріптор зверніть увагу на кодіровку, в файлі повинно використовуватися utf-8
         f = open("word.txt", "r", encoding="utf-8")
 
         for l in f.readlines():                                             #читаємо построков
@@ -49,9 +71,6 @@ def getTopScore():
         m = 0
     return m
 
-def pressKey(event):
-    pass
-
 def compareWord(s1, s2):
     res = 0                                                             #результат, що повертається
     for i in range(len(s1)):                                            #Порівнюємо s1 та s2 посимвольно
@@ -71,23 +90,53 @@ def getWordStar(ch):
     return ret
 
 def pressLetter(n):
-    global wordStar
+    global wordStar, score, userTry
+
+    if (btn[n]["text"] == "."):                                         #Перевіряємо, якщо клавіша вже була нажата, то прериваємо метод
+        return 0
     btn[n]["text"] = "."
     btn[n]["state"] = "disabled"
     oldWordStar = wordStar
     wordStar = getWordStar(stringAlphabet[n])
     count = compareWord(wordStar, oldWordStar)                          #Знаходимо відмінності між старою та новою версією
     wordLabel["text"] = wordStar
-    
+
+    if (count > 0):
+        score += count * 5
+    else:
+        score -= 20
+        if (score < 0):                                                 #Перевіряємо, щоб очки не звалилися в від'ємне значення
+            score = 0
+        userTry -= 1
+
+    updateInfo() 
     print(f"Ви натиснули на букву {stringAlphabet[n]}")
 
+    if (wordComp == wordStar):
+        score += score // 2                                             #додаємо 50% очков
+        updateInfo()                                                    #оновлюємо інформацію
+        #якщо заработано більше, ніж рекордна кількість, то повідомлюємо і записіємо рекорд
+        if (score > topScore):
+            messagebox.showinfo("Вітаю!", f"Ви побили рекорд! Вгадане слово: {wordComp}")
+            saveTopScore()           
+        else:
+            messagebox.showinfo("Ви вгадали!", f"Вгадане слово: {wordComp}")      
+        startNewRound()
+    elif (userTry <= 0):
+        messagebox.showinfo("Бу!", "Відведена кількість спроб закінчилася, спробуй ще!")
+        quit(0)
+
 def updateInfo():
-    pass
+    scoreLabel["text"] = f"Ваші очки: {score}"
+    topScoreLabel["text"] = f"Кращий рещултат: {topScore}"
+    userTryLabel["text"] = f"Залишилось спроб: {userTry}"
 
 #Створення вікна
 root = Tk()                       #в root зберігається посилання на вікно в пам'яті
 root.resizable(False, False)      #забороняємр зміну розмірів вікна
 root.title("Вгадай слово")        #Встановлюємо заголовок
+
+root.bind("<Key>", pressKey)      #обробник клавіш
 
 #Налаштування геометрії вікна
 WIDTH = 810  #Ширина
@@ -114,7 +163,7 @@ score = 0                       # поточні очки
 topScore = getTopScore()        # рекорд
 userTry = 10                    # кількість спроб
 
-#st = ord("А")                                      # для визначення символу на кнопці по коду
+st = ord("А")                                      # для визначення символу на кнопці по коду
 btn = []                                            # список для кнопок
 stringAlphabet = "АБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"  # укр абетка
 
@@ -126,6 +175,8 @@ for i in range(len(stringAlphabet)):
 
 wordComp = ""                                       #Визначаємо глобально: "загадене слово"
 wordStar = ""                                       #Визначаємо глобально: "слово з зірочками"
+
+dictionary = getWordsFromFile()
 
 #стартуємо
 startNewRound()
